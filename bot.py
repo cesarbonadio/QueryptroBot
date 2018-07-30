@@ -87,9 +87,9 @@ def echo_num(message):
 	r = requests.get(link+"?limit=1")
 	json_data = json.loads(r.text)
 	q = json_data['metadata']['num_cryptocurrencies']
-	bot.send_message(message.chat.id, " Number of current"\
-									  +" Cryptocurrencies in the market: "\
-									  +str(q))
+	bot.send_message(message.chat.id, " Current Number of"\
+       +" Cryptocurrencies in the market: "\
+	   +str(q))
 
 @bot.message_handler(commands=['time'])
 def echo_all(message):
