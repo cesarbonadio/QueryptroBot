@@ -27,9 +27,6 @@ def send_something(message):
 	bot.send_message(message.chat.id, "Choose one letter:")
 
 
-@bot.message_handler(func=lambda m: m.text is not None and m.text == 'hora')
-def echo_all(message):
-	bot.send_message(message.chat.id, "hola. la hora actual es:" + str(datetime.datetime.now()))
 
 @bot.message_handler(func=lambda m: m.text is not None and m.text == 'hola')
 def echo_all(message):
@@ -84,6 +81,7 @@ def echo_cryptocurrency(message):
 
 
 
+#handlers miscelaneos
 @bot.message_handler(commands=['num'])
 def echo_num(message):
 	r = requests.get(link+"?limit=1")
@@ -91,11 +89,16 @@ def echo_num(message):
 	q = json_data['metadata']['num_cryptocurrencies']
 	bot.send_message(message.chat.id, " Number of current"\
 									  +" Cryptocurrencies in the market: "\
-									  +str(q))		
+									  +str(q))
+
+@bot.message_handler(commands=['time'])
+def echo_all(message):
+	bot.send_message(message.chat.id, "Current time:" + str(datetime.datetime.now()))
+
 
 @bot.message_handler(commands=["ping"])
 def on_ping(message):
-	bot.reply_to(message, "Sigo vivo")
+	bot.reply_to(message, "I'm still alive")
 
 
 bot.polling(none_stop=True)
