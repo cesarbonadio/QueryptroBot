@@ -8,7 +8,7 @@ text_messages = {
 		u'/help or /start for welcome\n'
 		u'/num to see the numbers of cryptocurrencies\n'
 		u'/ping to see if you are connected to me\n'
-		u'/time to see the current time\n'
+		u'/time to see the current time-zone\n'
 		u'/contact to send a short message to the bot creator\n\n'
 		u'How to query:\n'
 		u'* Just type "Ln" and I will return n cryptocurrencies picked randomly (the limit is 100)\n'
