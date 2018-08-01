@@ -32,45 +32,44 @@ def send_something(message):
 	bot.send_message(message.chat.id, "Hi")
 
 
-#el comando "bitcoin" default
+
 @bot.message_handler(func=lambda m: m.text is not None and m.text == 'bitcoin')
 def send_bitcoin(message):
 	r = requests.get(reference.link+"?limit=1")
 	json_data = json.loads(r.text)
-	#print r.text
 	price = json_data['data']['1']['quotes']['USD']['price']
+	#algunos logs inutiles
+	#print price
 	#print r.text
-	print price
 	#print r.status_code
 	#print r.headers['content-type']
-	bot.send_message(message.chat.id, "BTC: "+str(price)+" $")
+	bot.send_message(message.chat.id, "BTC: "+str(price)+" $")	
 
 
-#10 criptomonedas
-@bot.message_handler(func=lambda m: m.text is not None and m.text == '10')
-def top_cryptocurrency(message):
-	
-	#logs
-	print message.text
-	mes = str(message.text)
-	print type(mes)
-	print mes
-	#
+#criptomonedas por nombre
+@bot.message_handler(commands=['value'])
+def value(message):
+	markup = types.ForceReply(selective=False)
+	msg = bot.send_message(message.chat.id, "Ok, send the name of the cryptocurrency", reply_markup=markup)
+	bot.register_next_step_handler(msg, search_cryptocurrency)
 
-	r = requests.get(reference.link+"?limit=10")
-	json_data = json.loads(r.text)
-	#for i in range (1,10):
-		#price = json_data['data'][str(i)]['quotes']['USD']['price']
-		#name = json_data['data'][str(i)]['']
-		#bot.send_message(message.chat.id, "BTC: "+str(price)+" $")
+def search_cryptocurrency(message):
+	bot.send_message(message.chat.id, "Searching value...")
+	#buscar cada 100
+	for i in range (0,2001,+100):
 
-	for k,v in json_data['data'].items():
-		price = v['quotes']['USD']['price']
-		name = v['name']
-		symbol = v['symbol']
-		#print price
-		bot.send_message(message.chat.id, str(name) + "(" + str(symbol) + ")" + ": " + str(price) + " $")
+		r = requests.get(reference.link+"?start="+ str(i) + "&limit="+ str(i+100))
+		json_data = json.loads(r.text)
 
+		for k,v in json_data['data'].items():
+			name = v['name']
+			slug = v['website_slug']
+
+			if name == message.text or slug == message.text:
+				price = v['quotes']['USD']['price']
+				symbol = v['symbol']
+				bot.send_message(message.chat.id, str(name) + "(" + str(symbol) + ")" + ": " + str(price) + " $")
+				return
 
 
 #Handler para el query Ln
@@ -110,9 +109,43 @@ def Ln_cryptocurrency(message):
 
 
 
+#10 criptomonedas
+@bot.message_handler(func=lambda m: m.text is not None and m.text == '10')
+def top_cryptocurrency(message):
+	
+	#logs
+	print message.text
+	mes = str(message.text)
+	print type(mes)
+	print mes
+	#
+
+	r = requests.get(reference.link+"?limit=10")
+	json_data = json.loads(r.text)
+	#for i in range (1,10):
+		#price = json_data['data'][str(i)]['quotes']['USD']['price']
+		#name = json_data['data'][str(i)]['']
+		#bot.send_message(message.chat.id, "BTC: "+str(price)+" $")
+
+	for k,v in json_data['data'].items():
+		price = v['quotes']['USD']['price']
+		name = v['name']
+		symbol = v['symbol']
+		#print price
+		bot.send_message(message.chat.id, str(name) + "(" + str(symbol) + ")" + ": " + str(price) + " $")
+
 
 
 ######handlers miscelaneos########
+#como enviar documentos
+@bot.message_handler(commands=['all'])
+def send_all(message):
+	doc = open('file.txt', 'w+')
+	doc.write('me gusta el coco')
+	doc.close
+	doc = open('file.txt', 'rb')
+	bot.send_document(message.chat.id, doc)
+
 
 #log de mensaje
 @bot.message_handler(commands=['contact'])
@@ -130,7 +163,7 @@ def send_admin(message):
 		name += u" (@{})".format(message.chat.username)
 
 	print "Message from " + name + ": " + message.text
-	bot.send_message(message.chat.id, "Thanks for your feedback! ")
+	bot.send_message(message.chat.id, "Thanks for your feedback!")
 
 
 #numero de criptomonedas
@@ -152,6 +185,7 @@ def send_time(message):
 @bot.message_handler(commands=["ping"])
 def on_ping(message):
 	bot.reply_to(message, "I'm still alive")
+
 
 
 bot.polling(none_stop=True)

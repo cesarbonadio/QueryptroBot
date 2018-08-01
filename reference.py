@@ -9,10 +9,12 @@ text_messages = {
 		u'/num to see the numbers of cryptocurrencies\n'
 		u'/ping to see if you are connected to me\n'
 		u'/time to see the current time-zone\n'
+		u'/value for start searching a specific coin\n'
 		u'/contact to send a short message to the bot creator\n\n'
 		u'How to query:\n'
 		u'* Just type "Ln" and I will return n cryptocurrencies picked randomly (the limit is 100)\n'
-		u'* If you want to know only the value of bitcoin type "bitcoin"\n'
+		u'* If you want to know only the value of a specific currency send the name after /value command\n'
+		u'* If you want to know only the value of bitcoin send "bitcoin"\n'
 		u'* If you want to know the value of the 10 most important crytocurrencies just send "10"\n',
 
 	'wrong_query' :
