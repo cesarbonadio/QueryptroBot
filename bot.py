@@ -9,7 +9,8 @@ import reference
 #types 
 from telebot import types
 import schedule,time
-bot = telebot.TeleBot(reference.api_token)
+
+bot = telebot.TeleBot(os.environ['TELEGRAM_TOKEN'])
 
 
 
