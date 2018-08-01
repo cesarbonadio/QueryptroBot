@@ -56,20 +56,23 @@ def value(message):
 def search_cryptocurrency(message):
 	bot.send_message(message.chat.id, "Searching value...")
 	#buscar cada 100
-	for i in range (0,2001,+100):
+	try:
+		for i in range (0,2001,+100):
 
-		r = requests.get(reference.link+"?start="+ str(i) + "&limit="+ str(i+100))
-		json_data = json.loads(r.text)
+			r = requests.get(reference.link+"?start="+ str(i) + "&limit="+ str(i+100))
+			json_data = json.loads(r.text)
 
-		for k,v in json_data['data'].items():
-			name = v['name']
-			slug = v['website_slug']
+			for k,v in json_data['data'].items():
+				name = v['name']
+				slug = v['website_slug']
 
-			if name == message.text or slug == message.text:
-				price = v['quotes']['USD']['price']
-				symbol = v['symbol']
-				bot.send_message(message.chat.id, str(name) + "(" + str(symbol) + ")" + ": " + str(price) + " $")
-				return
+				if name == message.text or name.lower() == message.text or slug == message.text:
+					price = v['quotes']['USD']['price']
+					symbol = v['symbol']
+					bot.send_message(message.chat.id, str(name) + "(" + str(symbol) + ")" + ": " + str(price) + " $")
+					return			
+	except:
+		bot.send_message(message.chat.id, 'I could not find any currency called "' + message.text + '"')				
 
 
 #Handler para el query Ln
@@ -141,7 +144,7 @@ def top_cryptocurrency(message):
 @bot.message_handler(commands=['all'])
 def send_all(message):
 	doc = open('file.txt', 'w+')
-	doc.write('me gusta el coco')
+	doc.write('This is a test')
 	doc.close
 	doc = open('file.txt', 'rb')
 	bot.send_document(message.chat.id, doc)
@@ -163,6 +166,9 @@ def send_admin(message):
 		name += u" (@{})".format(message.chat.username)
 
 	print "Message from " + name + ": " + message.text
+	doc = open('comments.txt','a+')
+	doc.write('Message from ' + name + ': ' + message.text + '\n')
+	doc.close
 	bot.send_message(message.chat.id, "Thanks for your feedback!")
 
 
@@ -187,5 +193,10 @@ def on_ping(message):
 	bot.reply_to(message, "I'm still alive")
 
 
-
-bot.polling(none_stop=True)
+while True:
+    try:
+    	bot.infinity_polling(True)
+    	bot.polling()
+    except:
+        time.sleep(15)
+#bot.polling(none_stop=True)

@@ -3,13 +3,13 @@ import telebot
 text_messages = {
 	'welcome':
 		u'Please welcome {name}!\n\n'
-		u'This bot chat is intended for queries about the price of cryptocurrencies.\n\n'
+		u'This bot chat is intended to query the price of cryptocurrencies.\n\n'
 		u'Available commands: \n'
 		u'/help or /start for welcome\n'
-		u'/num to see the numbers of cryptocurrencies\n'
+		u'/num to see the number of cryptocurrencies\n'
 		u'/ping to see if you are connected to me\n'
 		u'/time to see the current time-zone\n'
-		u'/value for start searching a specific coin\n'
+		u'/value to start searching a specific coin\n'
 		u'/contact to send a short message to the bot creator\n\n'
 		u'How to query:\n'
 		u'* Just type "Ln" and I will return n cryptocurrencies picked randomly (the limit is 100)\n'
