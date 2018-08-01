@@ -10,12 +10,14 @@ text_messages = {
 		u'/ping to see if you are connected to me\n\n'
 		u'/time to see the current time-zone\n\n'
 		u'/value to start searching a specific coin\n\n'
+		u'/file + coin name to generate a file with all coin data\n\n'
 		u'/contact to send a short message to the bot creator\n\n\n'
 		u'How to query:\n\n'
 		u'* Just type "Ln" and I will return n cryptocurrencies picked randomly (the limit is 100)\n\n'
 		u'* If you want to know only the value of a specific currency send the name after /value command.'
 		u'You can find the price by name or symbol. Remember that if the original name consist in 2 words,'
-		u'you"\'"ll need to put them all\n\n'
+		u'you'u"'" u'll need to put them all\n\n'
+		u'* If you want to generate a file with all coin data send /file followed by the coin name\n\n'
 		u'* If you want to know only the value of bitcoin send "bitcoin"\n\n'
 		u'* If you want to know the value of the 10 most important crytocurrencies just send "10"\n\n',
 

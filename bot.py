@@ -8,6 +8,7 @@ import telebot,datetime,requests,json,os
 import reference
 #types 
 from telebot import types
+import schedule,time
 bot = telebot.TeleBot(reference.api_token)
 
 
@@ -143,7 +144,8 @@ def generate_file(message):
     status = extract_arg(message.text)
     if len(status)==0:
         bot.send_message(message.chat.id, reference.text_messages['wrong_query_file']\
-                                         +reference.text_messages['wrong_query_final'])    
+                                         +reference.text_messages['wrong_query_final'])
+        return                            
     currency_name = concat_arg(status)
     bot.send_message(message.chat.id, "Searching coin...")
     v = find_by_name(str(currency_name),str(message.chat.id))
@@ -226,11 +228,19 @@ def send_time(message):
 def on_ping(message):
     bot.reply_to(message, "I'm still alive")
 
+def principal():
+    while True:
+        try:
+            bot.infinity_polling(True)
+            bot.polling(none_stop=True)
+        except:
+            time.sleep(10)
 
-while True:
-    try:
-       bot.infinity_polling(True)
-       bot.polling()
-    except:
-        time.sleep(10)
+
+principal()
+
+#schedule.every(10).minutes.do(principal)
+#while True:
+##        schedule.run_pending()
+#       time.sleep(1)        
 #bot.polling(none_stop=True)
