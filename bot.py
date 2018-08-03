@@ -1,26 +1,25 @@
-# Se necesita importar primero el modulo telebot
-# Luego crear el bot en @BotFather desde telegram
-# E instalar pytelegrambot
-
 #modulos
 import telebot,datetime,requests,json,os
+from datetime import datetime
 #modulos propios
-import reference
+import reference,util,secret
 #types 
 from telebot import types
 import schedule,time
 
-bot = telebot.TeleBot(reference.api_token, threaded=False)
+
+#Bot
+bot = telebot.TeleBot(secret.api_token, threaded=False)
 
 
 
-#Metodos sin handler
+#No handler
 def find_by_name(name_currency,chat_id):
     print name_currency
     try:
         for i in range (0,2001,+100):
 
-            r = requests.get(reference.link+"?start="+ str(i) + "&limit="+ str(i+100))
+            r = requests.get(reference.link+"ticker/?start="+ str(i) + "&limit="+ str(i+100))
             json_data = json.loads(r.text)
 
             for k,v in json_data['data'].items():
@@ -36,17 +35,6 @@ def find_by_name(name_currency,chat_id):
     except:
         bot.send_message(chat_id, 'I could not find any currency called "' + name_currency + '"')
         return
-
-def concat_arg(currency_in_list): 
-    currency_name = ''
-    for i in range (len(currency_in_list)):
-        currency_name += str(currency_in_list[i]) + " "
-    return currency_name[:-1]     
-
-def extract_arg(arg):
-    return arg.split()[1:]
-
-#####################################################################################
 
 
 
@@ -65,21 +53,19 @@ def send_welcome(message):
     bot.reply_to(message, reference.text_messages['welcome'].format(name=name)) 
 
 
-# Para respoder sin reply ante un comando en especifico
-@bot.message_handler(commands=['source'])
-def send_something(message):
-    bot.send_message(message.chat.id, "Hi")
 
 
 #Handler bitcoin solo
 @bot.message_handler(func=lambda m: m.text is not None and m.text == 'bitcoin')
 def send_bitcoin(message):
-    r = requests.get(reference.link+"?limit=1")
+    r = requests.get(reference.link+"ticker/?limit=1")
     json_data = json.loads(r.text)
     price = json_data['data']['1']['quotes']['USD']['price']
     print (r.status_code)
     print (r.headers['content-type'])
     bot.send_message(message.chat.id, "BTC: "+str(price)+" $")  
+
+
 
 
 #Handler de criptomonedas por nombre
@@ -95,6 +81,9 @@ def search_cryptocurrency(message):
     if v:
         price = v['quotes']['USD']['price']
         bot.send_message(message.chat.id, str(v['name']) + "(" + str(v['symbol']) + ")" + ": " + str(v['quotes']['USD']['price']) + " $")              
+
+
+
 
 
 #Handler para el query Ln
@@ -113,7 +102,7 @@ def Ln_cryptocurrency(message):
                                             + reference.text_messages['wrong_query_final'])
             return  
 
-    r = requests.get(reference.link+"?limit=" + str(number_cryptocurrencies))
+    r = requests.get(reference.link+"ticker/?limit=" + str(number_cryptocurrencies))
     json_data = json.loads(r.text)
 
     for k,v in json_data['data'].items():
@@ -124,11 +113,13 @@ def Ln_cryptocurrency(message):
 
 
 
+
+
 #Handler para el top 10 de criptomonedas
 @bot.message_handler(func=lambda m: m.text is not None and m.text == '10')
 def top_cryptocurrency(message):
     mes = str(message.text)
-    r = requests.get(reference.link+"?limit=10")
+    r = requests.get(reference.link+"ticker/?limit=10")
     json_data = json.loads(r.text)
 
     for k,v in json_data['data'].items():
@@ -139,15 +130,17 @@ def top_cryptocurrency(message):
 
 
 
+
+
 #Handler para generar el archivo
 @bot.message_handler(commands=['file'])
 def generate_file(message):
-    status = extract_arg(message.text)
+    status = util.extract_arg(message.text)
     if len(status)==0:
         bot.send_message(message.chat.id, reference.text_messages['wrong_query_file']\
                                          +reference.text_messages['wrong_query_final'])
         return                            
-    currency_name = concat_arg(status)
+    currency_name = util.concat_arg(status)
     bot.send_message(message.chat.id, "Searching coin...")
     v = find_by_name(str(currency_name),str(message.chat.id))
     if v:
@@ -177,14 +170,44 @@ def generate_file(message):
 
 
 ######handlers miscelaneos########
-#como enviar documentos
-@bot.message_handler(commands=['archivo'])
+# Para respoder sin reply ante un comando en especifico
+@bot.message_handler(commands=['global'])
+def find_global(message):
+    status = util.extract_arg(message.text)
+
+    r = requests.get(reference.link + "global")
+    json_data = json.loads(r.text)
+    last_update = datetime.fromtimestamp(int(json_data['data']['last_updated'])).strftime("%A, %B %d, %Y %I:%M:%S")
+
+    
+    global_stats = 'Cryptocurrencies: ' + str(json_data['data']['active_cryptocurrencies'])+\
+                   '\nActive markets: ' + str(json_data['data']['active_markets'])+\
+                   '\nBitcoin market percentaje: ' + str(json_data['data']['bitcoin_percentage_of_market_cap'])+ \
+                   '\nMarket capital: ' + str(int(float(json_data['data']['quotes']['USD']['total_market_cap'])))+\
+                   '\nVolume 24h: ' + str(json_data['data']['quotes']['USD']['total_volume_24h'])+\
+                   '\n\nLast update: ' + str(last_update)               
+
+    if len(status)==0:
+        bot.send_message(message.chat.id, global_stats)
+    elif status[0] == 'f':
+        doc = open('global.txt','w+')
+        doc.write(str(global_stats))
+        doc.close
+        doc = open('global.txt','rb')
+        bot.send_document(message.chat.id, doc)
+        os.remove('global.txt')
+    else:
+        bot.send_message(message.chat.id, reference.text_messages['wrong_query_global'] + reference.text_messages['wrong_query_final'])                          
+ 
+
+
+#test
+@bot.message_handler(commands=['test'])
 def send_all(message):
-    doc = open('file.txt', 'w+')
-    doc.write('This is a test')
-    doc.close
-    doc = open('file.txt', 'rb')
-    bot.send_document(message.chat.id, doc)
+    pass
+    #file_info = bot.get_file('comments.txt')
+    #file = requests.get('https://api.telegram.org/file/bot{0}/{1}'.format(reference.api_token, file_info.file_path))
+
 
 
 #Handler para enviar algun comentario
@@ -212,7 +235,7 @@ def send_admin(message):
 #numero de criptomonedas
 @bot.message_handler(commands=['num'])
 def send_num(message):
-    r = requests.get(reference.link+"?limit=1")
+    r = requests.get(reference.link+"ticker/?limit=1")
     json_data = json.loads(r.text)
     q = json_data['metadata']['num_cryptocurrencies']
     bot.send_message(message.chat.id, " Current Number of"\
@@ -229,6 +252,10 @@ def send_time(message):
 def on_ping(message):
     bot.reply_to(message, "I'm still alive")
 
+
+
+
+#Polling
 def principal():
     while True:
         try:
@@ -236,7 +263,6 @@ def principal():
             bot.polling(none_stop=True)
         except:
             time.sleep(10)
-
 
 principal()
 
