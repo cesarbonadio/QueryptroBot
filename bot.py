@@ -10,7 +10,7 @@ import reference
 from telebot import types
 import schedule,time
 
-bot = telebot.TeleBot(os.environ['TELEGRAM_TOKEN'])
+bot = telebot.TeleBot(reference.api_token, threaded=False)
 
 
 
@@ -240,8 +240,8 @@ def principal():
 
 principal()
 
-#schedule.every(10).minutes.do(principal)
-#while True:
-##        schedule.run_pending()
-#       time.sleep(1)        
+schedule.every(10).minutes.do(principal)
+while True:
+        schedule.run_pending()
+        time.sleep(1)        
 #bot.polling(none_stop=True)
