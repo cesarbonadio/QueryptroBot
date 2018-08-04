@@ -7,14 +7,14 @@ Necesita instalar el modulo de [pyTelegramBotAPI](https://github.com/eternnoir/p
 
 ### Instalación de pyTelegramBotAPI
 
-⋅⋅* Usando PIP:
+* Usando PIP:
 
 ```
 $ pip install pyTelegramBotAPI
 
 ```
 
-..* Usando el repositorio original (requiere git):
+* Usando el repositorio original (requiere git):
 
 ``` 
 $ git clone https://github.com/eternnoir/pyTelegramBotAPI.git
