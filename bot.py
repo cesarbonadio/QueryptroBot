@@ -15,26 +15,27 @@ bot = telebot.TeleBot(secret.api_token, threaded=False)
 
 #No handler
 def find_by_name(name_currency,chat_id):
-    print name_currency
     try:
-        for i in range (0,2001,+100):
+        r = requests.get(reference.link+"listings")
+        json_data = json.loads(r.text)
 
-            r = requests.get(reference.link+"ticker/?start="+ str(i) + "&limit="+ str(i+100))
-            json_data = json.loads(r.text)
+        for i in range (len(json_data['data'])):
+            if json_data['data'][i]['name'].lower() == name_currency.lower() or \
+            json_data['data'][i]['symbol'].lower() == name_currency.lower() or \
+            json_data['data'][i]['website_slug'].lower() == name_currency.lower():
+                coin_id = int(json_data['data'][i]['id'])
+                break
+            if i == len(json_data['data']) - 1:
+                raise Exception('error')    
+            
+        r2 = requests.get(reference.link+"/ticker/"+str(coin_id))
+        json_data2 = json.loads(r2.text) 
+        return json_data2['data']       
 
-            for k,v in json_data['data'].items():
-                name = v['name']
-                slug = v['website_slug']
-                symbol = v['symbol']
-
-                if name == name_currency or \
-                name.lower() == name_currency.lower() or \
-                slug.lower() == name_currency.lower() or \
-                symbol.lower() == name_currency.lower():
-                    return v         
-    except:
+    except Exception:
         bot.send_message(chat_id, 'I could not find any currency called "' + name_currency + '"')
         return
+
 
 
 
@@ -76,7 +77,6 @@ def value(message):
     bot.register_next_step_handler(msg, search_cryptocurrency)
 
 def search_cryptocurrency(message):
-    bot.send_message(message.chat.id, "Searching coin...")
     v = find_by_name(message.text,str(message.chat.id))
     if v:
         price = v['quotes']['USD']['price']
@@ -136,33 +136,37 @@ def top_cryptocurrency(message):
 @bot.message_handler(commands=['file'])
 def generate_file(message):
     status = util.extract_arg(message.text)
+
     if len(status)==0:
         bot.send_message(message.chat.id, reference.text_messages['wrong_query_file']\
                                          +reference.text_messages['wrong_query_final'])
-        return                            
+        return
+
     currency_name = util.concat_arg(status)
-    bot.send_message(message.chat.id, "Searching coin...")
     v = find_by_name(str(currency_name),str(message.chat.id))
+
     if v:
-        bot.send_message(message.chat.id, "Generating file...")
-        doc = open(currency_name + '.txt', 'w+')
-        doc.write('Name: ' + v['name'] + "\n")
-        doc.write('Symbol: ' + v['symbol'] + "\n")
-        doc.write('Global rank: '+ str(v['rank']) + "\n")
-        doc.write('Circulating supply: ' + str(v['circulating_supply']) + "\n")
-        doc.write('Total supply: '  + str(v['total_supply']) + "\n")
-        doc.write('Max supply: ' + str(v['max_supply']) + "\n\n")
-        doc.write('Price \n\n')
-        doc.write('Price now: ' + str(v['quotes']['USD']['price']) + " $" + "\n")
-        doc.write('Volume 24h: ' + str(v['quotes']['USD']['volume_24h']) + "\n")
-        doc.write('Market capital: ' + str(v['quotes']['USD']['market_cap']) + "\n")
-        doc.write('Percent change 1h: ' + str(v['quotes']['USD']['percent_change_1h']) + "\n")
-        doc.write('Percent change 24h: ' + str(v['quotes']['USD']['percent_change_24h']) + "\n")
-        doc.write('Percent change 7d: ' + str(v['quotes']['USD']['percent_change_24h']) + "\n")
+        doc = open(str(v['name']) + '.txt', 'w+')
+
+        coin_data = 'Name: ' + v['name'] + '\n' + \
+                    'Symbol: ' + v['symbol'] + '\n' + \
+                    'Global rank: '+ str(v['rank']) + '\n' + \
+                    'Circulating supply: ' + str(v['circulating_supply']) + '\n' + \
+                    'Total supply: '  + str(v['total_supply']) + '\n' + \
+                    'Max supply: ' + str(v['max_supply']) + '\n\n' + \
+                    'Price \n\n' + \
+                    'Price now: ' + str(v['quotes']['USD']['price']) + '$' + '\n' + \
+                    'Volume 24h: ' + str(v['quotes']['USD']['volume_24h']) + '\n' + \
+                    'Market capital: ' + str(v['quotes']['USD']['market_cap']) + '\n' + \
+                    'Percent change 1h: ' + str(v['quotes']['USD']['percent_change_1h']) + '\n' + \
+                    'Percent change 24h: ' + str(v['quotes']['USD']['percent_change_24h']) + '\n' + \
+                    'Percent change 7d: ' + str(v['quotes']['USD']['percent_change_24h']) + '\n' 
+
+        doc.write(coin_data)
         doc.close
-        doc = open(currency_name + '.txt' , 'rb')
+        doc = open(str(v['name']) + '.txt' , 'rb')
         bot.send_document(message.chat.id, doc)
-        os.remove(currency_name + '.txt')
+        os.remove(str(v['name']) + '.txt')
 
     
 
@@ -203,10 +207,9 @@ def find_global(message):
 
 #test
 @bot.message_handler(commands=['test'])
-def send_all(message):
+def send_all(message):            
     pass
-    #file_info = bot.get_file('comments.txt')
-    #file = requests.get('https://api.telegram.org/file/bot{0}/{1}'.format(reference.api_token, file_info.file_path))
+
 
 
 
@@ -216,6 +219,8 @@ def contact(message):
     markup = types.ForceReply(selective=False)
     msg = bot.send_message(message.chat.id, "Ok, send your message", reply_markup=markup)
     bot.register_next_step_handler(msg, send_admin)
+
+
 
 def send_admin(message):
     name = message.chat.first_name
@@ -251,6 +256,8 @@ def send_time(message):
 @bot.message_handler(commands=["ping"])
 def on_ping(message):
     bot.reply_to(message, "I'm still alive")
+
+
 
 
 
