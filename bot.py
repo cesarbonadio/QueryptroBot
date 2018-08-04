@@ -186,8 +186,8 @@ def find_global(message):
     
     global_stats = 'Cryptocurrencies: ' + str(json_data['data']['active_cryptocurrencies'])+\
                    '\nActive markets: ' + str(json_data['data']['active_markets'])+\
-                   '\nBitcoin market percentaje: ' + str(json_data['data']['bitcoin_percentage_of_market_cap'])+ \
-                   '\nMarket capital: ' + str(int(float(json_data['data']['quotes']['USD']['total_market_cap'])))+\
+                   '\nBitcoin market percentaje: ' + str(json_data['data']['bitcoin_percentage_of_market_cap'])+ "%" + \
+                   '\nMarket capital: ' + str(int(float(json_data['data']['quotes']['USD']['total_market_cap'])))+ "$" + \
                    '\nVolume 24h: ' + str(json_data['data']['quotes']['USD']['total_volume_24h'])+\
                    '\n\nLast update: ' + str(last_update)               
 
@@ -205,12 +205,13 @@ def find_global(message):
  
 
 
+
+
+
 #test
 @bot.message_handler(commands=['test'])
 def send_all(message):            
     pass
-
-
 
 
 #Handler para enviar algun comentario
