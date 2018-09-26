@@ -46,4 +46,5 @@ Por:
 Diseñado para uso personal. Deshabilitado el threading para evitar caida del polling
 con los servidores de telegram.
 
-Probado solo en python 2.7.15. Para correr: ` python bot.py `
+Probado solo en python 2.7.15 y python 3.6.6
+Para correr: ` python bot.py `

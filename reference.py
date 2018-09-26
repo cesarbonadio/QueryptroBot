@@ -8,7 +8,7 @@ text_messages = {
 		u'/help or /start for welcome\n\n'
 		u'/num to see the number of cryptocurrencies\n\n'
 		u'/ping to see if you are connected to me\n\n'
-		u'/time to see the current time-zone\n\n'
+		#u'/time to see the current time-zone\n\n'
 		u'/value to start searching a specific coin\n\n'
 		u'/file followed by coin name to generate a file with all coin data\n\n'
 		u'/contact to send a short message to the bot creator\n\n'
